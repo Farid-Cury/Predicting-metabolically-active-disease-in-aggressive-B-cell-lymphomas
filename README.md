@@ -48,6 +48,7 @@ Analyses using radiomic features selected by different feature selection methods
    - corrr
    - gghighlight
    - ggridges
+   - cutpointr
    - readxl
 
  #### Installation
@@ -68,6 +69,7 @@ Analyses using radiomic features selected by different feature selection methods
   "corrr",
   "gghighlight",
   "ggridges",
-  "readxl"
+  "readxl",
+  "cutpointr"
 ))
 
