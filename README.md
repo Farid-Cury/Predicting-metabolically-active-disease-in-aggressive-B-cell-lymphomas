@@ -8,30 +8,65 @@ This repository contains the code and resources used in a pilot study to develop
 
 # Repository Structure
 
-### 🖥️**Exploratory Data Analysis (EDA)**:
-Feature Selection: Identification of relevant clinical and radiomic features.
+### 🖥️Exploratory Data Analysis (EDA):
+- Feature Selection: Identification of relevant clinical and radiomic features.
+- Glycolysis-Related Proteins: Correlation between textural features and glycolysis-related protein expression.
 
-Glycolysis-Related Proteins: Analysis of metabolic features related to tumor glycolysis.
+### 🧠Machine Learning (ML) Models:
 
-### 🧠**Machine Learning (ML) Models**:
-
-Combined Models: Integration of clinical and radiomic data.
-
-Radiomic-Only Models: Predictive models based exclusively on radiomic features.
-
-Comparison Studies: Performance evaluation of combined vs. radiomic-only models.
+- Combined Models: Integration of clinical and radiomic data.
+- Radiomic-Only Models: Predictive models based exclusively on radiomic features.
+- Comparison Studies: Performance evaluation of combined vs. radiomic-only models.
 
 ### Trial-and-Error Experiments:
 
 #### Oversampling Techniques:
-SMOTENC for combined models and SMOTE for radiomic models.
+- SMOTENC for combined models and SMOTE for radiomic models.
 
 #### Feature-Specific Models:
-MTV (Metabolic Tumor Volume).
-
-IDM (Inverse Difference Moment).
-
-Ann Arbor Staging.
+- MTV (Metabolic Tumor Volume).
+- IDM (Inverse Difference Moment).
+- Ann Arbor Staging.
 
 #### Combined Features:
 Analyses using radiomic features selected by different feature selection methods.
+
+# Prerequisites and Installation
+- R (Version >= 4.00)
+- Packages:
+   - tidyverse
+   - tidymodels
+   - ggpubr
+   - themis
+   - stacks
+   - finetune
+   - vip
+   - tidyposterior
+   - modeldata
+   - ggrepel
+   - corrplot
+   - corrr
+   - gghighlight
+   - ggridges
+   - readxl
+
+ #### Installation
+ - Install the packages in R:
+ install.packages(c(
+  "tidyverse",
+  "tidymodels",
+  "ggpubr",
+  "themis",
+  "stacks",
+  "finetune",
+  "vip",
+  "tidyposterior",
+  "modeldata",
+  "ggrepel",
+  "corrplot",
+  "corrr",
+  "gghighlight",
+  "ggridges",
+  "readxl"
+))
+
