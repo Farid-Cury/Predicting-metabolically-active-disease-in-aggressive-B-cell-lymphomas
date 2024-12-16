@@ -18,7 +18,7 @@ This repository contains the code and resources used in a pilot study to develop
 - Radiomic-Only Models: Predictive models based exclusively on radiomic features.
 - Comparison Studies: Performance evaluation of combined vs. radiomic-only models.
 
-### Trial-and-Error Experiments:
+### ✅Trial-and-Error Experiments:
 
 #### Oversampling Techniques:
 - SMOTENC for combined models and SMOTE for radiomic models.
@@ -52,6 +52,7 @@ Analyses using radiomic features selected by different feature selection methods
 
  #### Installation
  - Install the packages in R:
+
  install.packages(c(
   "tidyverse",
   "tidymodels",
