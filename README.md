@@ -8,7 +8,7 @@ This repository contains the code and resources used in a pilot study to develop
 
 # Repository Structure
 
-- [Pasta de Códigos HTML no Google Drive](https://drive.google.com/drive/u/0/folders/1p9nfra71X9MXYBI6lSm_Lpv_ZU1jSel9)
+- [HTML code folder in Google Drive](https://drive.google.com/drive/u/0/folders/1p9nfra71X9MXYBI6lSm_Lpv_ZU1jSel9)
 
 ### 🖥️Exploratory Data Analysis (EDA):
 - Feature Selection: Identification of relevant clinical and radiomic features.
