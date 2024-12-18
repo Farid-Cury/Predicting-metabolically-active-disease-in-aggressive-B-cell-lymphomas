@@ -51,6 +51,7 @@ Analyses using radiomic features selected by different feature selection methods
    - gghighlight
    - ggridges
    - cutpointr
+   - discrim
    - readxl
 
  #### Installation
@@ -72,7 +73,8 @@ Analyses using radiomic features selected by different feature selection methods
   "gghighlight",
   "ggridges",
   "readxl",
-  "cutpointr"
+  "cutpointr",
+  "discrim"
 ))
 
 - Install the dataset (data_stro.xlsx)
