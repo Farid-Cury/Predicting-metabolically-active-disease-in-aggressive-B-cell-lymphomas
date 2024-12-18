@@ -600,7 +600,7 @@ rf_res %>%
 
 ```
 
-## ROC_AUC Random Forest
+## ROC_AUC LASSO
 ```{r}
 lasso_res %>%
   collect_predictions() %>% 
@@ -724,7 +724,7 @@ ggdensity(data_tr_rad, x = "Correlation",
           xlab = "Correlation", legend.title = "5-PS") + theme_pubr()
 
 ```
-## Note that IDM and MTV values are very different between responders and non-responders (good separability between the groups), unlike the correlation values.
+IDM and MTV values show notable differences between patients with and without hypermetabolic lesions on EoT PET, demonstrating good separability between the groups. In contrast, the correlation values show no such distinction.
 
 ## Dot plot with group means and reference line.
 ```{r}
@@ -808,11 +808,10 @@ ggplot(data_tr_all) +
   scale_color_viridis_d() +
   theme_minimal()
 ```
-# Note that non-responders tend to have lower IDM values. The opposite occurs for MTV, where non-responders tend to have higher MTV values.
+Patients with metabolically active disease tend to exhibit lower IDM values. Conversely, these patients typically show higher MTV values.
 
+## The last_fit argument fits the model on the training set and evaluates the model on the testing set. The testing set can only be used once to avoid data leakage.
 ```{r}
-# The last_fit argument fits the model on the training set and evaluates the model on the testing set. The testing set can only be used once to avoid data leakage.
-
 #rf.
 final_wf_lasso <- workflow() %>% 
   add_model(lasso_model) %>% 
