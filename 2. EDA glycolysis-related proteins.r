@@ -41,7 +41,7 @@ data_tr_all <- training(data_split)
 ## HK2 expression score optimal cutpoint 
 ```{r}
 library(cutpointr)
-data_tr_all$Esc_CAT <- fct_recode(data_tr_all$Esc_CAT, "1-3" = "0", "presence of 4-5" = "1")
+data_tr_all$Esc_CAT <- fct_recode(data_tr_all$Esc_CAT, "1-3" = "0", "4-5" = "1")
 data_tr_all$v50_expres_hkii_tumo <- as.numeric(data_tr_all$v50_expres_hkii_tumo)
 
 cutpoint_HK2 <- cutpointr(data_tr_all, v50_expres_hkii_tumo, Esc_CAT, 
@@ -443,6 +443,10 @@ tidy(glm_fit_HK2cp_staging)
 
 ## Exploring associations between radiomic features and glycolysis-related protein expression - tumor compartment.
 ```{r}
+
+data_tr_cp <- data_tr_cp %>%
+  select(v3_sexo:CAT_glut1_Tu_imput | CAT_cd147_Tu_imput, CAT_CAIX_Tumor | GLUT1_stroma:Esc_CAT | HK2tu_opt_cp:MCT4tu_opt_cp)
+
 # HK2
 p_values_hk2tu <- data_tr_cp %>%
   summarise(across(c(v3_sexo:SumVar, LDHAtu_opt_cp, MCT4tu_opt_cp), function(.x) {
@@ -484,9 +488,11 @@ ggplot(p_values_long_hk2tu, aes(x = Variable, y = -log10(p_value),
   theme(
     axis.text.x = element_blank(),   
     legend.position = "right",       
-    axis.ticks.x = element_blank()   
+    axis.ticks.x = element_blank(),
+    plot.title = element_text(size = 10)
   ) +  
-  labs(fill = "") +  
+  labs(title = "Association of HK2 tumor expression with clinical, laboratory, and radiomic features",
+    fill = "") +  
   geom_text_repel(             
     aes(label = label),        
     vjust = 0.8,               
@@ -539,9 +545,11 @@ ggplot(p_values_long_ldhatu, aes(x = Variable, y = -log10(p_value),
   theme(
     axis.text.x = element_blank(),   
     legend.position = "right",       
-    axis.ticks.x = element_blank()   
+    axis.ticks.x = element_blank(),
+    plot.title = element_text(size = 10)
   ) +  
-  labs(fill = "") +  
+  labs(title = "Association of LDHA tumor expression with clinical, laboratory, and radiomic features",
+    fill = "") +  
   geom_text_repel(             
     aes(label = label),        
     vjust = 0.8,               
@@ -594,9 +602,11 @@ ggplot(p_values_long_mct4tu, aes(x = Variable, y = -log10(p_value),
   theme(
     axis.text.x = element_blank(),   
     legend.position = "right",       
-    axis.ticks.x = element_blank()   
+    axis.ticks.x = element_blank(),
+    plot.title = element_text(size = 10)
   ) +  
-  labs(fill = "") +  
+  labs(title = "Association of MCT4 tumor expression with clinical, laboratory, and radiomic features",
+    fill = "") +  
   geom_text_repel(             
     aes(label = label),        
     vjust = 0.8,               
@@ -614,7 +624,7 @@ ggplot(p_values_long_mct4tu, aes(x = Variable, y = -log10(p_value),
 ```{r}
 # GLUT1 stroma
 p_values_glut1stro <- data_tr_cp %>%
-  summarise(across(c(v3_sexo:SumVar, HK2tu_opt_cp, LDHAtu_opt_cp), function(.x) {
+  summarise(across(c(v3_sexo:CAT_CAIX_Tumor, HK2_stroma:MCT4tu_opt_cp), function(.x) {
     if (is.numeric(.x)) {  
       shapiro_p <- shapiro.test(.x)$p.value  
       if (shapiro_p < significance_level) {  
@@ -649,8 +659,10 @@ ggplot(p_values_long_glut1stro, aes(x = Variable, y = -log10(p_value), fill = si
   xlab("Variable") +
   ylab("-log10(p-value)") +
   theme_minimal() +
-  theme(axis.text.x = element_blank()) +  # Hides the text on the X-axis
-  labs(fill = "") +
+  theme(axis.text.x = element_blank(),
+        plot.title = element_text(size = 10)) +  # Hides the text on the X-axis
+  labs(title = "Association of GLUT1 stromal expression with clinical, laboratory, and radiomic features",
+    fill = "") +
   # Adds labels using ggrepel to avoid overlap
   geom_text_repel(
     aes(label = label),
@@ -662,7 +674,7 @@ ggplot(p_values_long_glut1stro, aes(x = Variable, y = -log10(p_value), fill = si
 
 # HK2 stroma
 p_values_hk2stro <- data_tr_cp %>%
-  summarise(across(c(v3_sexo:SumVar, HK2tu_opt_cp, LDHAtu_opt_cp), function(.x) {
+  summarise(across(c(v3_sexo:GLUT1_stroma, LDHA_stroma:MCT4tu_opt_cp), function(.x) {
     if (is.numeric(.x)) {  
       shapiro_p <- shapiro.test(.x)$p.value  
       if (shapiro_p < significance_level) {  
@@ -697,8 +709,10 @@ ggplot(p_values_long_hk2stro, aes(x = Variable, y = -log10(p_value), fill = sign
   xlab("Variable") +
   ylab("-log10(p-value)") +
   theme_minimal() +
-  theme(axis.text.x = element_blank()) +  # Hides the text on the X-axis
-  labs(fill = "") +
+  theme(axis.text.x = element_blank(),
+        plot.title = element_text(size = 10)) +  # Hides the text on the X-axis
+  labs(title = "Association of HK2 stromal expression with clinical, laboratory, and radiomic features",
+       fill = "") +
   # Adds labels using ggrepel to avoid overlap
   geom_text_repel(
     aes(label = label),
@@ -710,7 +724,7 @@ ggplot(p_values_long_hk2stro, aes(x = Variable, y = -log10(p_value), fill = sign
 
 # LDHA stroma
 p_values_ldhastro <- data_tr_cp %>%
-  summarise(across(c(v3_sexo:SumVar, HK2tu_opt_cp, LDHAtu_opt_cp), function(.x) {
+  summarise(across(c(v3_sexo:HK2_stroma, CAIX_stroma:HK2tu_opt_cp, MCT4tu_opt_cp), function(.x) {
     if (is.numeric(.x)) {  
       shapiro_p <- shapiro.test(.x)$p.value  
       if (shapiro_p < significance_level) {  
@@ -745,8 +759,10 @@ ggplot(p_values_long_ldhastro, aes(x = Variable, y = -log10(p_value), fill = sig
   xlab("Variable") +
   ylab("-log10(p-value)") +
   theme_minimal() +
-  theme(axis.text.x = element_blank()) +  # Hides the text on the X-axis
-  labs(fill = "") +
+  theme(axis.text.x = element_blank(),
+        plot.title = element_text(size = 10)) +  # Hides the text on the X-axis
+  labs(title = "Association of LDHA stromal expression with clinical, laboratory, and radiomic features",
+       fill = "") +
   # Adds labels using ggrepel to avoid overlap
   geom_text_repel(
     aes(label = label),
@@ -758,7 +774,7 @@ ggplot(p_values_long_ldhastro, aes(x = Variable, y = -log10(p_value), fill = sig
 
 # CAIX stroma
 p_values_ca9stro <- data_tr_cp %>%
-  summarise(across(c(v3_sexo:SumVar, HK2tu_opt_cp, LDHAtu_opt_cp), function(.x) {
+  summarise(across(c(v3_sexo:LDHA_stroma, MCT4_stroma:MCT4tu_opt_cp), function(.x) {
     if (is.numeric(.x)) {  
       shapiro_p <- shapiro.test(.x)$p.value  
       if (shapiro_p < significance_level) {  
@@ -793,8 +809,10 @@ ggplot(p_values_long_ca9stro, aes(x = Variable, y = -log10(p_value), fill = sign
   xlab("Variable") +
   ylab("-log10(p-value)") +
   theme_minimal() +
-  theme(axis.text.x = element_blank()) +  # Hides the text on the X-axis
-  labs(fill = "") +
+  theme(axis.text.x = element_blank(),
+        plot.title = element_text(size = 10)) +  # Hides the text on the X-axis
+  labs(title = "Association of CA9 stromal expression with clinical, laboratory, and radiomic features",
+       fill = "") +
   # Adds labels using ggrepel to avoid overlap
   geom_text_repel(
     aes(label = label),
@@ -806,7 +824,7 @@ ggplot(p_values_long_ca9stro, aes(x = Variable, y = -log10(p_value), fill = sign
 
 # MCT4 stroma
 p_values_mct4stro <- data_tr_cp %>%
-  summarise(across(c(v3_sexo:SumVar, HK2tu_opt_cp, LDHAtu_opt_cp), function(.x) {
+  summarise(across(c(v3_sexo:CAIX_stroma, CD147_stroma:MCT4tu_opt_cp), function(.x) {
     if (is.numeric(.x)) {  
       shapiro_p <- shapiro.test(.x)$p.value  
       if (shapiro_p < significance_level) {  
@@ -841,8 +859,10 @@ ggplot(p_values_long_mct4stro, aes(x = Variable, y = -log10(p_value), fill = sig
   xlab("Variable") +
   ylab("-log10(p-value)") +
   theme_minimal() +
-  theme(axis.text.x = element_blank()) +  # Hides the text on the X-axis
-  labs(fill = "") +
+  theme(axis.text.x = element_blank(),
+        plot.title = element_text(size = 10)) +  # Hides the text on the X-axis
+  labs(title = "Association of MCT4 stromal expression with clinical, laboratory, and radiomic features",
+       fill = "") +
   # Adds labels using ggrepel to avoid overlap
   geom_text_repel(
     aes(label = label),
@@ -854,7 +874,7 @@ ggplot(p_values_long_mct4stro, aes(x = Variable, y = -log10(p_value), fill = sig
 
 # CD147 stroma
 p_values_cd147stro <- data_tr_cp %>%
-  summarise(across(c(v3_sexo:SumVar, HK2tu_opt_cp, LDHAtu_opt_cp), function(.x) {
+  summarise(across(c(v3_sexo:MCT4_stroma, GLUT3_stroma:MCT4tu_opt_cp), function(.x) {
     if (is.numeric(.x)) {  
       shapiro_p <- shapiro.test(.x)$p.value  
       if (shapiro_p < significance_level) {  
@@ -889,8 +909,10 @@ ggplot(p_values_long_cd147stro, aes(x = Variable, y = -log10(p_value), fill = si
   xlab("Variable") +
   ylab("-log10(p-value)") +
   theme_minimal() +
-  theme(axis.text.x = element_blank()) +  # Hides the text on the X-axis
-  labs(fill = "") +
+  theme(axis.text.x = element_blank(),
+        plot.title = element_text(size = 10)) +  # Hides the text on the X-axis
+  labs(title = "Association of CD147 stromal expression with clinical, laboratory, and radiomic features",
+       fill = "") +
   # Adds labels using ggrepel to avoid overlap
   geom_text_repel(
     aes(label = label),
@@ -902,7 +924,7 @@ ggplot(p_values_long_cd147stro, aes(x = Variable, y = -log10(p_value), fill = si
 
 # GLUT3 stroma
 p_values_glut3stro <- data_tr_cp %>%
-  summarise(across(c(v3_sexo:SumVar, HK2tu_opt_cp, LDHAtu_opt_cp), function(.x) {
+  summarise(across(c(v3_sexo:CD147_stroma, SUVmax:MCT4tu_opt_cp), function(.x) {
     if (is.numeric(.x)) {  
       shapiro_p <- shapiro.test(.x)$p.value  
       if (shapiro_p < significance_level) {  
@@ -937,8 +959,10 @@ ggplot(p_values_long_glut3stro, aes(x = Variable, y = -log10(p_value), fill = si
   xlab("Variable") +
   ylab("-log10(p-value)") +
   theme_minimal() +
-  theme(axis.text.x = element_blank()) +  # Hides the text on the X-axis
-  labs(fill = "") +
+  theme(axis.text.x = element_blank(),
+        plot.title = element_text(size = 10)) +  # Hides the text on the X-axis
+  labs(title = "Association of GLUT3 stromal expression with clinical, laboratory, and radiomic features",
+       fill = "") +
   # Adds labels using ggrepel to avoid overlap
   geom_text_repel(
     aes(label = label),
@@ -1010,10 +1034,10 @@ Stroma: GLUT1, GLUT3, CD147, CAIX, HK2, LDHA, MCT4.
 ```{r}
 data_tr_coexp <- data_tr_cp %>%
   dplyr::mutate(
-    # Tumor coexpression score
+    # Tumor co-expression score
     tu_coex_score = rowSums(across(c(CAT_glut1_Tu_imput, CAT_cd147_Tu_imput, CAT_CAIX_Tumor, HK2tu_opt_cp, LDHAtu_opt_cp, MCT4tu_opt_cp)) == 1),
     tu_coex_score = factor(tu_coex_score, levels = 0:6),
-    # Stroma coexpression score
+    # Stroma co-expression score
     stro_coex_score = rowSums(across(c(GLUT1_stroma, GLUT3_stroma, CD147_stroma, CAIX_stroma, HK2_stroma, LDHA_stroma, MCT4_stroma)) == 1),
     stro_coex_score = factor(stro_coex_score, levels = 0:7),
     # Tumor and stroma combined score
@@ -1027,7 +1051,7 @@ str(data_tr_coexp)
 
 ```
 
-## Tumor co-expression score visualization
+## Co-expression score combined visualization
 ```{r}
 # Reclassify the levels of 'Esc_CAT' to make them more interpretable
 data_tr_coexp$Esc_CAT <- fct_recode(data_tr_coexp$Esc_CAT, "1-3" = "0", "4-5" = "1")
@@ -1036,62 +1060,14 @@ data_tr_coexp$Esc_CAT <- fct_recode(data_tr_coexp$Esc_CAT, "1-3" = "0", "4-5" = 
 data_tr_coexp_tu_freq <- data_tr_coexp %>%
   dplyr::count(tu_coex_score, Esc_CAT, name = "freq")
 
-# Create a scatter plot using ggplot2
-ggplot(data_tr_coexp_tu_freq, aes(x = tu_coex_score, y = Esc_CAT, color = Esc_CAT, size = freq)) +
-  geom_point() +
-  xlab("Tumor expression score") +
-  ylab("5-PS") +
-  scale_fill_manual(values = c("grey60", "grey40", "grey20")) +
-  theme_pubr() +
-  border() +
-  labs(color = "5-PS") +
-  scale_size_continuous(name = "Frequency", range = c(3, 10)) +
-  theme(legend.position = "right")
-  
-```
-
-## Stroma co-expression score visualization
-```{r}
 # Count the frequency of combinations between 'stro_coex_score' and 'Esc_CAT'
 data_tr_coexp_stro_freq <- data_tr_coexp %>%
   dplyr::count(stro_coex_score, Esc_CAT, name = "freq")
 
-# Create a scatter plot using ggplot2
-ggplot(data_tr_coexp_stro_freq, aes(x = stro_coex_score, y = Esc_CAT, color = Esc_CAT, size = freq)) +
-  geom_point() +
-  xlab("Stroma expression score") +
-  ylab("5-PS") +
-  scale_fill_manual(values = c("grey60", "grey40", "grey20")) +
-  theme_pubr() +
-  border() +
-  labs(color = "5-PS") +
-  scale_size_continuous(name = "Frequency", range = c(3, 10)) +
-  theme(legend.position = "right")
-  
-```
-
-## Tumor & stroma co-expression score visualization
-```{r}
 # Count the frequency of combinations between 'tu_stro_coex_score' and 'Esc_CAT'
 data_tr_coexp_tu_stro_freq <- data_tr_coexp %>%
   dplyr::count(tu_stro_coex_score, Esc_CAT, name = "freq")
 
-# Create a scatter plot using ggplot2
-ggplot(data_tr_coexp_tu_stro_freq, aes(x = tu_stro_coex_score, y = Esc_CAT, color = Esc_CAT, size = freq)) +
-  geom_point() +
-  xlab("Tumor & stroma expression score") +
-  ylab("5-PS") +
-  scale_fill_manual(values = c("grey60", "grey40", "grey20")) +
-  theme_pubr() +
-  border() +
-  labs(color = "5-PS") +
-  scale_size_continuous(name = "Frequency", range = c(3, 10)) +
-  theme(legend.position = "right")
-  
-```
-
-## Combined visualization
-```{r}
 data_tr_long_scores <- data_tr_coexp %>%
   dplyr::select(tu_coex_score, stro_coex_score,tu_stro_coex_score, Esc_CAT) %>%
   pivot_longer(cols = c(tu_coex_score:tu_stro_coex_score), names_to = "Variable", values_to = "Expression") %>%
@@ -1137,7 +1113,7 @@ p_values_coexp
 
 ```
 
-## Correlation analysis between coexpression scores and radiomic features.
+## Correlation analysis between co-expression scores and radiomic features.
 ```{r}
 data_tr_corr <- data_tr_coexp %>%
   dplyr::select(SUVmax:SumVar | tu_coex_score:tu_stro_coex_score)
@@ -1159,49 +1135,50 @@ network_plot(cor_mat, min_cor = 0.2)
 # ggsave("network_plot.png", plot = p, width = 12, height = 12, units = "cm", dpi = 600) # <- best parameters for saving the network plot.
 
 ```
-## Co-expression analysis - evaluating the significantly associated co-expressions
-This co-expression analysis was based on the results of association tests evaluating the expression of specific proteins. Only proteins whose expression showed statistically significant associations were included in the scores.
+## Co-expression Analysis: Evaluating Significant Associations
+This analysis focused on the co-expression of specific proteins based on association tests. Only proteins with statistically significant associations were included in the scoring system.
 
-1. Tumor Co-expression Associated Score (tu_coexp_assoc)
-Tumor-related proteins significantly associated: HK2, LDHA, and MCT4.
+**1. Tumor Co-expression Associated Score (tu_coexp_assoc)**
+Significantly associated tumor proteins: HK2, LDHA, and MCT4.
+Scoring criteria:
 If any of these proteins (HK2, LDHA, or MCT4) is not expressed (value = 0), the score is set to 0 (absence of associated co-expression).
-If any of these proteins is expressed (value = 1), the score is set to 1 (presence of associated co-expression).
+If all of these proteins are expressed (value = 1), the score is set to 1 (presence of associated co-expression).
 
-2. Stroma Co-expression Associated Score (stro_coexp_assoc)
-CAIX and CD147 were significantly associated.
+**2. Stroma Co-expression Associated Score (stro_coexp_assoc)**
+Significantly associated stroma proteins: CAIX and CD147.
+Scoring criteria:
 If either CAIX or CD147 is not expressed (value = 0), the score is set to 0 (absence of associated co-expression).
-If either CAIX or CD147 is expressed (value = 1), the score is set to 1 (presence of associated co-expression).
+If both CAIX and CD147 are expressed (value = 1), the score is set to 1 (presence of associated co-expression).
 
-3. Combined Tumor and Stroma Co-expression Associated Score (tu_stro_coexp_assoc)
-Represents the co-expression of one significantly associated protein from the tumor compartment (LDHA) and one from the stroma (MCT4).
+**3. Combined Tumor and Stroma Co-expression Associated Score (tu_stro_coexp_assoc)**
+Significantly associated proteins: LDHA (tumor) and MCT4 (stroma).
+Scoring criteria:
 If either MCT4 (stroma) or LDHA (tumor) is not expressed (value = 0), the score is set to 0 (absence of associated co-expression).
-If either MCT4 (stroma) or LDHA (tumor) is expressed (value = 1), the score is set to 1 (presence of associated co-expression).
+If both MCT4 (stroma) and LDHA (tumor) are expressed (value = 1), the score is set to 1 (presence of associated co-expression).
 ```{r}
-data_tr_coexp_assoc <- data_tr_coexp %>%
+data_tr_coexp_assoc_1 <- data_tr_coexp %>%
   dplyr::mutate(
     tu_coexp_assoc = case_when(
       HK2tu_opt_cp == 0 | LDHAtu_opt_cp == 0 | MCT4tu_opt_cp == 0 ~ 0,
-      HK2tu_opt_cp == 1 | LDHAtu_opt_cp == 1 | MCT4tu_opt_cp == 1 ~ 1
+      HK2tu_opt_cp == 1 & LDHAtu_opt_cp == 1 & MCT4tu_opt_cp == 1 ~ 1
     ),
     stro_coexp_assoc = case_when(
       CAIX_stroma == 0 | CD147_stroma == 0 ~ 0,
-      CAIX_stroma == 1 | CD147_stroma == 1 ~ 1
+      CAIX_stroma == 1 & CD147_stroma == 1 ~ 1
     ),
     tu_stro_coexp_assoc = case_when(
-      MCT4_stroma == 0 | LDHAtu_opt_cp == 0 ~ 0,
-      MCT4_stroma == 1 | LDHAtu_opt_cp == 1 ~ 1
+      MCT4tu_opt_cp == 0 | MCT4_stroma == 0 | LDHAtu_opt_cp == 0 ~ 0,
+      MCT4tu_opt_cp == 1 & MCT4_stroma == 1 & LDHAtu_opt_cp == 1 ~ 1
     )
   )
-
-View(data_tr_coexp_assoc)
 ```
 
 ## Visualization of association tests between significantly associated tumor co-expressions and clinical-laboratory and radiomic features.
 ```{r}
-data_tr_coexp_assoc <- data_tr_coexp_assoc %>%
+data_tr_coexp_assoc_1 <- data_tr_coexp_assoc_1 %>%
   mutate(across(tu_coexp_assoc:tu_stro_coexp_assoc, as.factor))
 
-p_values_tu_coexp_assoc <- data_tr_coexp_assoc %>%
+p_values_tu_coexp_assoc_1 <- data_tr_coexp_assoc_1 %>%
   summarise(across(c(v3_sexo:v15_doenca_vol_bulky, SUVmax:Esc_CAT), function(.x) {
     if (is.numeric(.x)) {  
       shapiro_p <- shapiro.test(.x)$p.value  
@@ -1222,16 +1199,16 @@ p_values_tu_coexp_assoc <- data_tr_coexp_assoc %>%
     }
     return(p_value)
   }))
-p_values_tu_coexp_assoc
+p_values_tu_coexp_assoc_1
 
 # Transforming the dataframe to long format for visualization
-p_values_long_tu_coexp_assoc <- p_values_tu_coexp_assoc %>%
+p_values_long_tu_coexp_assoc_1 <- p_values_tu_coexp_assoc_1 %>%
   pivot_longer(everything(), names_to = "Variable", values_to = "p_value") %>%
   mutate(significant = ifelse(p_value < significance_level, "Significant", "Not Significant"),
          label = ifelse(p_value < significance_level, Variable, ""))
 
 # Creating the plot with ggrepel to adjust labels
-ggplot(p_values_long_tu_coexp_assoc, aes(x = Variable, y = -log10(p_value),
+ggplot(p_values_long_tu_coexp_assoc_1, aes(x = Variable, y = -log10(p_value),
                                 fill = significant)) +
   geom_col() +  
   geom_hline(yintercept = log_significance_level, color = "#797A7B") +  
@@ -1244,7 +1221,8 @@ ggplot(p_values_long_tu_coexp_assoc, aes(x = Variable, y = -log10(p_value),
     legend.position = "right",       
     axis.ticks.x = element_blank()   
   ) +  
-  labs(fill = "") +  
+  labs(title = "Tumor co-expression 1",
+    fill = "") +  
   geom_text_repel(             
     aes(label = label),        
     vjust = 0.8,               
@@ -1260,7 +1238,7 @@ ggplot(p_values_long_tu_coexp_assoc, aes(x = Variable, y = -log10(p_value),
 
 ## Visualization of association tests between significantly associated stroma co-expressions and clinical-laboratory and radiomic features.
 ```{r}
-p_values_stro_coexp_assoc <- data_tr_coexp_assoc %>%
+p_values_stro_coexp_assoc_1 <- data_tr_coexp_assoc_1 %>%
   summarise(across(c(v3_sexo:v15_doenca_vol_bulky, SUVmax:Esc_CAT), function(.x) {
     if (is.numeric(.x)) {  
       shapiro_p <- shapiro.test(.x)$p.value  
@@ -1281,16 +1259,16 @@ p_values_stro_coexp_assoc <- data_tr_coexp_assoc %>%
     }
     return(p_value)
   }))
-p_values_stro_coexp_assoc
+p_values_stro_coexp_assoc_1
 
 # Transforming the dataframe to long format for visualization
-p_values_long_stro_coexp_assoc <- p_values_stro_coexp_assoc %>%
+p_values_long_stro_coexp_assoc_1 <- p_values_stro_coexp_assoc_1 %>%
   pivot_longer(everything(), names_to = "Variable", values_to = "p_value") %>%
   mutate(significant = ifelse(p_value < significance_level, "Significant", "Not Significant"),
          label = ifelse(p_value < significance_level, Variable, ""))
 
 # Creating the plot with ggrepel to adjust labels
-ggplot(p_values_long_stro_coexp_assoc, aes(x = Variable, y = -log10(p_value),
+ggplot(p_values_long_stro_coexp_assoc_1, aes(x = Variable, y = -log10(p_value),
                                 fill = significant)) +
   geom_col() +  
   geom_hline(yintercept = log_significance_level, color = "#797A7B") +  
@@ -1303,7 +1281,8 @@ ggplot(p_values_long_stro_coexp_assoc, aes(x = Variable, y = -log10(p_value),
     legend.position = "right",       
     axis.ticks.x = element_blank()   
   ) +  
-  labs(fill = "") +  
+  labs(title = "Stromal co-expression 1",
+    fill = "") +  
   geom_text_repel(             
     aes(label = label),        
     vjust = 0.8,               
@@ -1319,7 +1298,7 @@ ggplot(p_values_long_stro_coexp_assoc, aes(x = Variable, y = -log10(p_value),
 
 ## Visualization of association tests between significantly associated tumor and stroma co-expressions and clinical-laboratory and radiomic features.
 ```{r}
-p_values_tu_stro_coexp_assoc <- data_tr_coexp_assoc %>%
+p_values_tu_stro_coexp_assoc_1 <- data_tr_coexp_assoc_1 %>%
   summarise(across(c(v3_sexo:v15_doenca_vol_bulky, SUVmax:Esc_CAT), function(.x) {
     if (is.numeric(.x)) {  
       shapiro_p <- shapiro.test(.x)$p.value  
@@ -1340,16 +1319,16 @@ p_values_tu_stro_coexp_assoc <- data_tr_coexp_assoc %>%
     }
     return(p_value)
   }))
-p_values_tu_stro_coexp_assoc
+p_values_tu_stro_coexp_assoc_1
 
 # Transforming the dataframe to long format for visualization
-p_values_long_tu_stro_coexp_assoc <- p_values_tu_stro_coexp_assoc %>%
+p_values_long_tu_stro_coexp_assoc_1 <- p_values_tu_stro_coexp_assoc_1 %>%
   pivot_longer(everything(), names_to = "Variable", values_to = "p_value") %>%
   mutate(significant = ifelse(p_value < significance_level, "Significant", "Not Significant"),
          label = ifelse(p_value < significance_level, Variable, ""))
 
 # Creating the plot with ggrepel to adjust labels
-ggplot(p_values_long_tu_stro_coexp_assoc, aes(x = Variable, y = -log10(p_value),
+ggplot(p_values_long_tu_stro_coexp_assoc_1, aes(x = Variable, y = -log10(p_value),
                                 fill = significant)) +
   geom_col() +  
   geom_hline(yintercept = log_significance_level, color = "#797A7B") +  
@@ -1362,7 +1341,8 @@ ggplot(p_values_long_tu_stro_coexp_assoc, aes(x = Variable, y = -log10(p_value),
     legend.position = "right",       
     axis.ticks.x = element_blank()   
   ) +  
-  labs(fill = "") +  
+  labs(title = "Tumor & stroma co-expression 1",
+    fill = "") +  
   geom_text_repel(             
     aes(label = label),        
     vjust = 0.8,               
@@ -1374,4 +1354,332 @@ ggplot(p_values_long_tu_stro_coexp_assoc, aes(x = Variable, y = -log10(p_value),
     size = 3                   
   )
 ```
+
+## Now, the logic was reversed, allowing the score to be 1 if any of the markers is expressed and requiring all markers to be absent for the score to be 0.
+
+The previous code evaluates full co-expression (all markers must be expressed for the score to be positive).
+The updated code evaluates the minimum presence of co-expression (only one expressed marker is required for a positive score).
+```{r}
+data_tr_coexp_assoc_2 <- data_tr_coexp %>%
+  dplyr::mutate(
+    tu_coexp_assoc = case_when(
+      HK2tu_opt_cp == 0 & LDHAtu_opt_cp == 0 & MCT4tu_opt_cp == 0 ~ 0,
+      HK2tu_opt_cp == 1 | LDHAtu_opt_cp == 1 | MCT4tu_opt_cp == 1 ~ 1
+    ),
+    stro_coexp_assoc = case_when(
+      CAIX_stroma == 0 & CD147_stroma == 0 ~ 0,
+      CAIX_stroma == 1 | CD147_stroma == 1 ~ 1
+    ),
+    tu_stro_coexp_assoc = case_when(
+      MCT4tu_opt_cp == 0 & MCT4_stroma == 0 & LDHAtu_opt_cp == 0 ~ 0,
+      MCT4tu_opt_cp == 1 | MCT4_stroma == 1 | LDHAtu_opt_cp == 1 ~ 1
+    )
+  )
+
+View(data_tr_coexp_assoc_2)
+```
+
+## Visualization of association tests between significantly associated tumor co-expressions and clinical-laboratory and radiomic features.
+```{r}
+data_tr_coexp_assoc_2 <- data_tr_coexp_assoc_2 %>%
+  mutate(across(tu_coexp_assoc:tu_stro_coexp_assoc, as.factor))
+
+p_values_tu_coexp_assoc_2 <- data_tr_coexp_assoc_2 %>%
+  summarise(across(c(v3_sexo:v15_doenca_vol_bulky, SUVmax:Esc_CAT), function(.x) {
+    if (is.numeric(.x)) {  
+      shapiro_p <- shapiro.test(.x)$p.value  
+      if (shapiro_p < significance_level) {  
+        p_value <- wilcox.test(.x ~ tu_coexp_assoc, exact = FALSE, alternative = "two.sided")$p.value
+      } else {  
+        p_value <- t.test(.x ~ tu_coexp_assoc, alternative = "two.sided")$p.value
+      }
+    } else {  
+      contingency_table <- table(.x, tu_coexp_assoc)
+      expected_values <- chisq.test(contingency_table, simulate.p.value = FALSE)$expected
+      
+      if (any(expected_values < 5) | (sum(expected_values < 5) / length(expected_values) > 0.2)) {
+        p_value <- fisher.test(contingency_table, alternative = "two.sided")$p.value
+      } else {
+        p_value <- chisq.test(contingency_table, simulate.p.value = FALSE)$p.value
+      }
+    }
+    return(p_value)
+  }))
+p_values_tu_coexp_assoc_2
+
+# Transforming the dataframe to long format for visualization
+p_values_long_tu_coexp_assoc_2 <- p_values_tu_coexp_assoc_2 %>%
+  pivot_longer(everything(), names_to = "Variable", values_to = "p_value") %>%
+  mutate(significant = ifelse(p_value < significance_level, "Significant", "Not Significant"),
+         label = ifelse(p_value < significance_level, Variable, ""))
+
+# Creating the plot with ggrepel to adjust labels
+ggplot(p_values_long_tu_coexp_assoc_2, aes(x = Variable, y = -log10(p_value),
+                                fill = significant)) +
+  geom_col() +  
+  geom_hline(yintercept = log_significance_level, color = "#797A7B") +  
+  scale_fill_manual(values = c("Significant" = "#FF8282", "Not Significant" = "#797A7B")) +  
+  xlab("Variable") +  
+  ylab("-log10(p-value)") +  
+  theme_pubr() +  
+  theme(
+    axis.text.x = element_blank(),   
+    legend.position = "right",       
+    axis.ticks.x = element_blank()   
+  ) +  
+  labs(title = "Tumor co-expression 2",
+    fill = "") +  
+  geom_text_repel(             
+    aes(label = label),        
+    vjust = 0.8,               
+    box.padding = 0.1,         
+    point.padding = 0.1,       
+    nudge_y = 0.1,             
+    nudge_x = -0.2,            
+    segment.color = "transparent",  
+    size = 3                   
+  ) 
+
+```
+
+## Visualization of association tests between significantly associated stroma co-expressions and clinical-laboratory and radiomic features.
+```{r}
+p_values_stro_coexp_assoc_2 <- data_tr_coexp_assoc_2 %>%
+  summarise(across(c(v3_sexo:v15_doenca_vol_bulky, SUVmax:Esc_CAT), function(.x) {
+    if (is.numeric(.x)) {  
+      shapiro_p <- shapiro.test(.x)$p.value  
+      if (shapiro_p < significance_level) {  
+        p_value <- wilcox.test(.x ~ stro_coexp_assoc, exact = FALSE, alternative = "two.sided")$p.value
+      } else {  
+        p_value <- t.test(.x ~ stro_coexp_assoc, alternative = "two.sided")$p.value
+      }
+    } else {  
+      contingency_table <- table(.x, stro_coexp_assoc)
+      expected_values <- chisq.test(contingency_table, simulate.p.value = FALSE)$expected
+      
+      if (any(expected_values < 5) | (sum(expected_values < 5) / length(expected_values) > 0.2)) {
+        p_value <- fisher.test(contingency_table, alternative = "two.sided")$p.value
+      } else {
+        p_value <- chisq.test(contingency_table, simulate.p.value = FALSE)$p.value
+      }
+    }
+    return(p_value)
+  }))
+p_values_stro_coexp_assoc_2
+
+# Transforming the dataframe to long format for visualization
+p_values_long_stro_coexp_assoc_2 <- p_values_stro_coexp_assoc_2 %>%
+  pivot_longer(everything(), names_to = "Variable", values_to = "p_value") %>%
+  mutate(significant = ifelse(p_value < significance_level, "Significant", "Not Significant"),
+         label = ifelse(p_value < significance_level, Variable, ""))
+
+# Creating the plot with ggrepel to adjust labels
+ggplot(p_values_long_stro_coexp_assoc_2, aes(x = Variable, y = -log10(p_value),
+                                fill = significant)) +
+  geom_col() +  
+  geom_hline(yintercept = log_significance_level, color = "#797A7B") +  
+  scale_fill_manual(values = c("Significant" = "#FF8282", "Not Significant" = "#797A7B")) +  
+  xlab("Variable") +  
+  ylab("-log10(p-value)") +  
+  theme_pubr() +  
+  theme(
+    axis.text.x = element_blank(),   
+    legend.position = "right",       
+    axis.ticks.x = element_blank()   
+  ) +  
+  labs(title = "Stromal co-expression 2",
+    fill = "") +  
+  geom_text_repel(             
+    aes(label = label),        
+    vjust = 0.8,               
+    box.padding = 0.1,         
+    point.padding = 0.1,       
+    nudge_y = 0.1,             
+    nudge_x = -0.2,            
+    segment.color = "transparent",  
+    size = 3                   
+  )
+
+```
+
+## Visualization of association tests between significantly associated tumor and stroma co-expressions and clinical-laboratory and radiomic features.
+```{r}
+p_values_tu_stro_coexp_assoc_2 <- data_tr_coexp_assoc_2 %>%
+  summarise(across(c(v3_sexo:v15_doenca_vol_bulky, SUVmax:Esc_CAT), function(.x) {
+    if (is.numeric(.x)) {  
+      shapiro_p <- shapiro.test(.x)$p.value  
+      if (shapiro_p < significance_level) {  
+        p_value <- wilcox.test(.x ~ tu_stro_coexp_assoc, exact = FALSE, alternative = "two.sided")$p.value
+      } else {  
+        p_value <- t.test(.x ~ tu_stro_coexp_assoc, alternative = "two.sided")$p.value
+      }
+    } else {  
+      contingency_table <- table(.x, tu_stro_coexp_assoc)
+      expected_values <- chisq.test(contingency_table, simulate.p.value = FALSE)$expected
+      
+      if (any(expected_values < 5) | (sum(expected_values < 5) / length(expected_values) > 0.2)) {
+        p_value <- fisher.test(contingency_table, alternative = "two.sided")$p.value
+      } else {
+        p_value <- chisq.test(contingency_table, simulate.p.value = FALSE)$p.value
+      }
+    }
+    return(p_value)
+  }))
+p_values_tu_stro_coexp_assoc_2
+
+# Transforming the dataframe to long format for visualization
+p_values_long_tu_stro_coexp_assoc_2 <- p_values_tu_stro_coexp_assoc_2 %>%
+  pivot_longer(everything(), names_to = "Variable", values_to = "p_value") %>%
+  mutate(significant = ifelse(p_value < significance_level, "Significant", "Not Significant"),
+         label = ifelse(p_value < significance_level, Variable, ""))
+
+# Creating the plot with ggrepel to adjust labels
+ggplot(p_values_long_tu_stro_coexp_assoc_2, aes(x = Variable, y = -log10(p_value),
+                                fill = significant)) +
+  geom_col() +  
+  geom_hline(yintercept = log_significance_level, color = "#797A7B") +  
+  scale_fill_manual(values = c("Significant" = "#FF8282", "Not Significant" = "#797A7B")) +  
+  xlab("Variable") +  
+  ylab("-log10(p-value)") +  
+  theme_pubr() +  
+  theme(
+    axis.text.x = element_blank(),   
+    legend.position = "right",       
+    axis.ticks.x = element_blank()   
+  ) +  
+  labs(title = "Tumor & stroma co-expression",
+    fill = "") +  
+  geom_text_repel(             
+    aes(label = label),        
+    vjust = 0.8,               
+    box.padding = 0.1,         
+    point.padding = 0.1,       
+    nudge_y = 0.1,             
+    nudge_x = -0.2,            
+    segment.color = "transparent",  
+    size = 3                   
+  )
+```
+
+## Cluster Prominence predicting the expression of at least one of the following: MCT4tu, MCT4stro, LDHAtu.
+```{r}
+set.seed(12)
+glm_fit_tu_stro_ClusP <- logistic_reg(mode = "classification") %>%
+  set_engine(engine = "glm") %>% 
+  fit(tu_stro_coexp_assoc ~ ClusP, data = data_tr_coexp_assoc_2)
+tidy(glm_fit_tu_stro_ClusP)
+
+glm_tidy_tu_stro_ClusP <- tidy(glm_fit_tu_stro_ClusP, conf.int = TRUE)
+
+ggplot(glm_tidy_tu_stro_ClusP, aes(x = term, y = estimate)) +
+  geom_point() +  
+  geom_errorbar(aes(ymin = conf.low, ymax = conf.high), width = 0.1) +  
+  geom_hline(yintercept = 0, color = "black") +   
+  labs(
+       x = "Variable",
+       y = "log-odds") +
+  theme_pubr()
+
+```
+## Entropy predicting the expression of at least one of the following: MCT4tu, MCT4stro, LDHAtu.
+```{r}
+set.seed(12)
+glm_fit_tu_stro_Entropy <- logistic_reg(mode = "classification") %>%
+  set_engine(engine = "glm") %>% 
+  fit(tu_stro_coexp_assoc ~ Entropy, data = data_tr_coexp_assoc_2)
+tidy(glm_fit_tu_stro_Entropy)
+
+glm_tidy_tu_stro_Entropy <- tidy(glm_fit_tu_stro_Entropy, conf.int = TRUE)
+
+ggplot(glm_tidy_tu_stro_Entropy, aes(x = term, y = estimate)) +
+  geom_point() +  
+  geom_errorbar(aes(ymin = conf.low, ymax = conf.high), width = 0.1) +  
+  geom_hline(yintercept = 0, color = "black") +   
+  labs(
+       x = "Variable",
+       y = "log-odds") +
+  theme_pubr()
+
+```
+
+## Sum Entropy predicting the expression of at least one of the following: MCT4tu, MCT4stro, LDHAtu.
+```{r}
+set.seed(12)
+glm_fit_tu_stro_SumEnt <- logistic_reg(mode = "classification") %>%
+  set_engine(engine = "glm") %>% 
+  fit(tu_stro_coexp_assoc ~ SumEnt, data = data_tr_coexp_assoc_2)
+tidy(glm_fit_tu_stro_SumEnt)
+
+glm_tidy_tu_stro_SumEnt <- tidy(glm_fit_tu_stro_SumEnt, conf.int = TRUE)
+
+ggplot(glm_tidy_tu_stro_SumEnt, aes(x = term, y = estimate)) +
+  geom_point() +  
+  geom_errorbar(aes(ymin = conf.low, ymax = conf.high), width = 0.1) +  
+  geom_hline(yintercept = 0, color = "black") +   
+  labs(
+       x = "Variable",
+       y = "log-odds") +
+  theme_pubr()
+
+```
+
+## Only sum entropy could significantly predict the expression of MCT4tu, MCT4stro and/or LDHAtu.
+Sum Entropy measures the non-uniformity or complexity of an image's texture. It serves as a key metric for quantifying image heterogeneity and has shown significant associations with the biological features of neoplastic lesions, particularly the expression of tumor and/or stromal MCT4, with or without tumor LDHA expression.
+
+## Multivariate logistic regression.
+```{r}
+# normalizing the data.
+data_tr_coexp_assoc_2_norm <- data_tr_coexp_assoc_2 %>%
+  select(ClusP, SumEnt, Entropy) %>%
+  scale() %>%
+  as.data.frame()  
+
+# adding the outcome back to the dataset.
+data_tr_coexp_assoc_2_norm$tu_stro_coexp_assoc <- data_tr_coexp_assoc_2$tu_stro_coexp_assoc
+
+# multivariate logistic regression.
+set.seed(12)
+glm_fit_tu_stro_ClusP_SumEnt <- logistic_reg(mode = "classification") %>%
+  set_engine(engine = "glm") %>% 
+  fit(tu_stro_coexp_assoc ~ SumEnt + ClusP, data = data_tr_coexp_assoc_2_norm)
+tidy(glm_fit_tu_stro_ClusP_SumEnt)
+
+# visualizing results
+glm_tidy_tu_stro_ClusP_SumEnt <- tidy(glm_fit_tu_stro_ClusP_SumEnt, conf.int = TRUE)
+
+ggplot(glm_tidy_tu_stro_ClusP_SumEnt, aes(x = term, y = estimate)) +
+  geom_point() +  
+  geom_errorbar(aes(ymin = conf.low, ymax = conf.high), width = 0.1) +  
+  geom_hline(yintercept = 0, color = "black") +   
+  labs(
+       x = "Variable",
+       y = "log-odds") +
+  theme_pubr()
+
+```
+
+```{r}
+# multivariate logistic regression.
+set.seed(12)
+glm_fit_tu_stro_ClusP_Ent <- logistic_reg(mode = "classification") %>%
+  set_engine(engine = "glm") %>% 
+  fit(tu_stro_coexp_assoc ~ Entropy + ClusP, data = data_tr_coexp_assoc_2_norm)
+tidy(glm_fit_tu_stro_ClusP_Ent)
+
+# Visualizing results.
+glm_tidy_tu_stro_ClusP_Ent <- tidy(glm_fit_tu_stro_ClusP_Ent, conf.int = TRUE)
+
+ggplot(glm_tidy_tu_stro_ClusP_Ent, aes(x = term, y = estimate)) +
+  geom_point() +  
+  geom_errorbar(aes(ymin = conf.low, ymax = conf.high), width = 0.1) +  
+  geom_hline(yintercept = 0, color = "black") +   
+  labs(
+       x = "Variable",
+       y = "log-odds") +
+  theme_pubr()
+
+```
+
+The p-values from the univariate logistic regressions for ClusP and Entropy were below or close to 0.100, warranting the use of a multivariate logistic regression. Given the high correlation between Entropy and SumEnt (r=0.88, as determined by the correlation test), two separate analyses were conducted: ClusP + Entropy and ClusP + SumEnt. In both cases, no variable showed a p<0.05. It is important to note that the variables were normalized prior to the analyses.
+
 
