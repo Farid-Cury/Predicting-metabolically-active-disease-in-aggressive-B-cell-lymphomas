@@ -18,6 +18,7 @@ This repository contains the code and resources used in a pilot study to develop
 
 - Combined Models: Integration of clinical and radiomic data.
 - Radiomic-Only Models: Predictive models based exclusively on radiomic features.
+- Clinical-Only Models: Models including key clinical predictors.
 - Comparison Studies: Performance evaluation of combined vs. radiomic-only models.
 
 ### ✅Trial-and-Error Experiments:
